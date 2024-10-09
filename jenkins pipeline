@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('checkout') {
+            steps {
+                git 'https://github.com/devopsbykunal/simple-java-project.git'
+            }
+        }
+        stage('build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+        stage('test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+        stage('artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+        stage('nexus') {
+            steps {
+                nexusArtifactUploader artifacts: [[artifactId: 'works-with-heroku', classifier: '', file: 'target/works-with-heroku-1.0.war', type: '.war']], credentialsId: '6fc8598f-6126-4069-bc01-ec3bba28d906', groupId: 'works.buddy.samples', nexusUrl: '13.53.87.90:8081', nexusVersion: 'nexus3', protocol: 'http', repository: 'simple', version: '1.0'
+            }
+        }
+        stage('deploy') {
+            steps {
+                ansiblePlaybook credentialsId: 'ae01c11a-f5e5-467c-841d-03b2b2257aa8', disableHostKeyChecking: true, installation: 'ansible', inventory: '/etc/ansible/hosts', limit: '$server', playbook: '/etc/ansible/deploy.yml', vaultTmpPath: ''
+            }
+        }
+        
+        
+    }
+}
