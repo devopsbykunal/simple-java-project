@@ -1,0 +1,6 @@
+- hosts: all
+  tasks:
+    - name: copying war file
+      copy:
+        src: /var/lib/jenkins/workspace/jenkins-java/target/works-with-heroku-1.0.war
+        dest: /root/tomcat/webapps
